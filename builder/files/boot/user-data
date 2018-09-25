@@ -8,7 +8,7 @@
 # Documentation: http://cloudinit.readthedocs.io/en/0.7.9/index.html
 
 # Set your hostname here, the manage_etc_hosts will update the hosts file entries as well
-hostname: black-pearl
+hostname: geopoppy
 manage_etc_hosts: true
 
 # You could modify this for your own user information
@@ -18,7 +18,7 @@ users:
     sudo: ALL=(ALL) NOPASSWD:ALL
     shell: /bin/bash
     groups: users,docker,video,input
-    plain_text_passwd: hypriot
+    plain_text_passwd: geopoppy
     lock_passwd: false
     ssh_pwauth: true
     chpasswd: { expire: false }
@@ -67,6 +67,8 @@ package_upgrade: false
 runcmd:
   # Pickup the hostname changes
   - 'systemctl restart avahi-daemon'
+   # load and start docker image(s)
+  - '/src/start.sh'
 
 #  # Activate WiFi interface
 #  - 'ifup wlan0'

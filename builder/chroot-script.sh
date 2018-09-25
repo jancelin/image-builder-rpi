@@ -247,6 +247,73 @@ chmod +x usr/local/bin/rpi-serial-console
 # fix eth0 interface name
 ln -s /dev/null /etc/systemd/network/99-default.link
 
+#----------------------------------------------------
+#Geopoppy
+##wifi
+apt-get install -y dnsmasq hostapd 
+wget --no-check-certificate -P /etc https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/dhcpcd.conf 
+wget --no-check-certificate -P /etc/network/interfaces.d https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/wlan0 
+wget --no-check-certificate -P /etc/hostapd https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/hostapd.conf  
+mv /etc/default/hostapd /etc/default/hostapd.bak 
+wget --no-check-certificate -P /etc/default https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/hostapd 
+mv /etc/dnsmasq.conf /etc/dnsmasq.conf.orig 
+wget --no-check-certificate -P /etc https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/dnsmasq.conf 
+mv /etc/sysctl.conf /etc/sysctl.conf.bak 
+wget --no-check-certificate -P /etc https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/sysctl.conf 
+wget --no-check-certificate -P /etc https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/iptables.ipv4.nat
+wget --no-check-certificate -P /etc https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/rc.local 
+chmod +x  /etc/rc.local 
+
+##get check_docker.sh
+wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/jancelin/geo-poppy/master/install/check_docker.sh 
+wget --no-check-certificate -P /etc/systemd/system https://raw.githubusercontent.com/jancelin/geo-poppy/master/install/Cdocker.service 
+
+#get docker-compose.yml
+wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/jancelin/geo-poppy/master/docker-compose-flash.yml
+mv /home/pirate/docker-compose-flash.yml /home/pirate/docker-compose.yml
+
+#get postgresql backup sql
+wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/jancelin/docker-postgis/master/setup-database.sh
+wget --no-check-certificate -P /home/pirate https://github.com/jancelin/docker-postgis/raw/master/geopoppy.sql
+
+# import docker images
+mkdir /src && cd /src
+wget http://147.100.92.48:8099/portainer.tar.gz
+wget http://147.100.92.48:8099/postgres10-2.4-arm32_1.tar.gz
+wget http://147.100.92.48:8099/qgis-server2.14LTR-0.2.tar.gz
+wget http://147.100.92.48:8099/release_3_2_arm32_1.tar.gz
+wget http://147.100.92.48:8099/rpi-cloudcmd.tar.gz
+wget http://147.100.92.48:8099/rpi-redis.tar.gz
+wget http://147.100.92.48:8099/tracking_1_0.tar.gz
+
+# create startup script
+cat << EOF > /src/start.sh
+#!/bin/bash
+cd /src
+docker load --input portainer.tar.gz
+docker load --input postgres10-2.4-arm32_1.tar.gz
+docker load --input qgis-server2.14LTR-0.2.tar.gz
+docker load --input release_3_2_arm32_1.tar.gz
+docker load --input rpi-cloudcmd.tar.gz
+docker load --input rpi-redis.tar.gz
+docker load --input tracking_1_0.tar.gz
+cd /home/pirate
+docker-compose up -d &&
+# systemctl checkdocker.sh
+chmod +x /home/pirate/check_docker.sh
+systemctl enable Cdocker.service
+systemctl start Cdocker.service
+#modif du compose: https://github.com/jancelin/geo-poppy/blob/master/install/auto_install_geopoppy_32bits.sh
+fLine=$(awk '/entrypoint:/ { print NR}' docker-compose.yml)&&
+endLine=$((fLine+2))&&
+for i in `seq $fLine  $endLine `
+do
+sed -i -e "$i s/^ /#/" docker-compose.yml
+done
+EOF
+chmod 770 /src/start.sh
+#---------------------------------------------------------
+
 # cleanup APT cache and lists
 apt-get clean
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

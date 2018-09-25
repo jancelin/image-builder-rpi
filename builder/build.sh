@@ -26,7 +26,7 @@ echo CIRCLE_TAG="${CIRCLE_TAG}"
 
 # name of the sd-image we gonna create
 HYPRIOT_IMAGE_VERSION=${VERSION:="dirty"}
-HYPRIOT_IMAGE_NAME="hypriotos-rpi-${HYPRIOT_IMAGE_VERSION}.img"
+HYPRIOT_IMAGE_NAME="GeoPoppy-${HYPRIOT_IMAGE_VERSION}.img"
 export HYPRIOT_IMAGE_VERSION
 
 # create build directory for assembling our image filesystem
@@ -81,14 +81,14 @@ rm -Rf ${BUILD_PATH}/boot
 tar -czf /image_with_kernel_root.tar.gz -C ${BUILD_PATH} .
 du -sh ${BUILD_PATH}
 ls -alh /image_with_kernel_*.tar.gz
-
+#---------------------------------------------------------------------docker commit focused_knuth image-builder-rpi:temp1
 # download the ready-made raw image for the RPi
-if [ ! -f "${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" ]; then
-  wget -q -O "${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" "https://github.com/hypriot/image-builder-raw/releases/download/${RAW_IMAGE_VERSION}/${RAW_IMAGE}.zip"
-fi
+#if [ ! -f "${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" ]; then
+  wget -q -O "${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" "http://147.100.92.48:8099/rpi-raw.img.zip" ######if enlevé sinon il prends l'ancien fichier!!!
+#fi
 
 # verify checksum of the ready-made raw image
-echo "${RAW_IMAGE_CHECKSUM} ${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" | sha256sum -c -
+#echo "${RAW_IMAGE_CHECKSUM} ${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" | sha256sum -c -
 
 unzip -p "${BUILD_RESULT_PATH}/${RAW_IMAGE}" > "/${HYPRIOT_IMAGE_NAME}"
 
