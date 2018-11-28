@@ -84,7 +84,7 @@ ls -alh /image_with_kernel_*.tar.gz
 #---------------------------------------------------------------------docker commit focused_knuth image-builder-rpi:temp1
 # download the ready-made raw image for the RPi
 #if [ ! -f "${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" ]; then
-  wget -q -O "${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" "http://147.100.92.48:8099/rpi-raw.img.zip" ######if enlevé sinon il prends l'ancien fichier!!!
+  wget -q -O "${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" "https://cartman.sig.inra.fr/geopoppy/rpi-raw.img.zip" ######if enlevé sinon il prends l'ancien fichier!!!
 #fi
 
 # verify checksum of the ready-made raw image
