@@ -271,6 +271,7 @@ wget --no-check-certificate -P /etc/systemd/system https://raw.githubusercontent
 #get docker-compose.yml
 wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/jancelin/geo-poppy/master/docker-compose-flash.yml
 mv /home/pirate/docker-compose-flash.yml /home/pirate/docker-compose.yml
+wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/jancelin/geo-poppy/master/docker-compose-arm32.yml
 
 #get postgresql backup sql
 wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/jancelin/docker-postgis/master/setup-database.sh
@@ -289,6 +290,7 @@ wget https://cartman.sig.inra.fr/geopoppy/docker/tracking_1_0.tar.gz
 # create startup script
 cat << EOF > /src/start.sh
 #!/bin/bash
+set -xv
 cd /src
 docker load --input portainer.tar.gz
 docker load --input postgres10-2.4-arm32_1.tar.gz
@@ -299,38 +301,17 @@ docker load --input redis4.tar.gz
 docker load --input tracking_1_0.tar.gz
 cd /home/pirate
 docker-compose up -d &&
+#change docker-compose file
+rm /home/pirate/docker-compose.yml 
+mv /home/pirate/docker-compose-arm32.yml /home/pirate/docker-compose.yml &&
+# change owner root > pirate 
+chown pirate:pirate -R ${PWD}/geopoppy/qgis &&
+chown pirate:pirate ${PWD}/docker-compose.yml &&
 # systemctl checkdocker.sh
-chmod +x /home/pirate/check_docker.sh
-systemctl enable Cdocker.service
+chmod +x /home/pirate/check_docker.sh &&
+systemctl enable Cdocker.service &&
 systemctl start Cdocker.service
-#modif du compose: https://github.com/jancelin/geo-poppy/blob/master/install/auto_install_geopoppy_32bits.sh
-fLine=$(awk '/entrypoint:/ { print NR}' docker-compose.yml)&&
-endLine=$((fLine+2))&&
-for i in `seq $fLine  $endLine `
-do
-sed -i -e "$i s/^ /#/" docker-compose.yml
-done
-#blink green led for display Victory!!
-for i in `seq 1 24`
-do
-sudo sh -c "echo default-on > /sys/class/leds/led0/trigger"   # Static LED on
-sleep 0.2
-sudo sh -c "echo none > /sys/class/leds/led0/trigger"        # Static LED off
-sleep 0.2
-sudo sh -c "echo default-on > /sys/class/leds/led0/trigger"   # Static LED on
-sleep 0.2
-sudo sh -c "echo none > /sys/class/leds/led0/trigger"        # Static LED off
-sleep 0.2
-sudo sh -c "echo default-on > /sys/class/leds/led0/trigger"   # Static LED on
-sleep 0.2
-sudo sh -c "echo none > /sys/class/leds/led0/trigger"        # Static LED off
-sleep 0.2
-sudo sh -c "echo default-on > /sys/class/leds/led0/trigger"   # Static LED on
-sleep 1.5
-sudo sh -c "echo none > /sys/class/leds/led0/trigger"        # Static LED off
-sleep 0.2
-done
-sudo sh -c "echo mmc0 > /sys/class/leds/led0/trigger"        # The normal behaviour
+echo "Installation END"
 EOF
 
 chmod 770 /src/start.sh
