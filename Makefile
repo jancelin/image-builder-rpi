@@ -4,10 +4,10 @@ build:
 	docker build -t image-builder-rpi .
 
 sd-image: build
-	docker run --rm --privileged -v $(pwd):/workspace -v /boot:/boot -v /lib/modules:/lib/modules -e CIRCLE_TAG -e VERSION image-builder-rpi
+	docker run --rm --privileged -v $(pwd):/workspace -v /boot:/boot -v /lib/modules:/lib/modules -v /etc/resolv.conf:/etc/resolv.conf -e CIRCLE_TAG -e VERSION image-builder-rpi
 
 shell: build
-	docker run -ti --privileged -v $(pwd):/workspace -v /boot:/boot -v /lib/modules:/lib/modules -e CIRCLE_TAG -e VERSION image-builder-rpi bash
+	docker run -ti --privileged -v $(pwd):/workspace -v /boot:/boot -v /lib/modules:/lib/modules -v /etc/resolv.conf:/etc/resolv.conf -e CIRCLE_TAG -e VERSION image-builder-rpi bash
 
 test:
 	VERSION=dirty docker run --rm -ti --privileged -v $(shell pwd):/workspace -v /boot:/boot -v /lib/modules:/lib/modules -e CIRCLE_TAG -e VERSION image-builder-rpi bash -c "unzip /workspace/hypriotos-rpi-dirty.img.zip && rspec --format documentation --color /workspace/builder/test/*_spec.rb"

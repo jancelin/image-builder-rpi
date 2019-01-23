@@ -92,7 +92,9 @@ HYPRIOT_DEVICE="Raspberry Pi"
 DEST=$(readlink -m /etc/resolv.conf)
 export DEST
 mkdir -p "$(dirname "${DEST}")"
-echo "nameserver 8.8.8.8" > "${DEST}"
+#problème proxy à l'univ !!!!
+#echo "nameserver 8.8.8.8" > "${DEST}"
+echo "nameserver 10.2.40.230" > "${DEST}"
 
 # set up hypriot rpi repository for rpi specific kernel- and firmware-packages
 PACKAGECLOUD_FPR=418A7F2FB0E1E6E7EABF6FE8C2E73424D59097AB
