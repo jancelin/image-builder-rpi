@@ -304,6 +304,7 @@ docker load --input redis4.tar.gz
 docker load --input tracking_1_0.tar.gz
 cd /home/pirate
 docker-compose up -d &&
+sleep 60
 #change docker-compose file
 rm /home/pirate/docker-compose.yml 
 mv /home/pirate/docker-compose-arm32.yml /home/pirate/docker-compose.yml &&
