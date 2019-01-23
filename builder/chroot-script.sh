@@ -308,8 +308,8 @@ docker-compose up -d &&
 rm /home/pirate/docker-compose.yml 
 mv /home/pirate/docker-compose-arm32.yml /home/pirate/docker-compose.yml &&
 # change owner root > pirate 
-chown pirate:pirate -R ${PWD}/geopoppy/qgis &&
-chown pirate:pirate ${PWD}/docker-compose.yml &&
+chown pirate:pirate -R /home/pirate/geopoppy/qgis &&
+chown pirate:pirate /home/pirate/docker-compose.yml &&
 # systemctl checkdocker.sh
 chmod +x /home/pirate/check_docker.sh &&
 systemctl enable Cdocker.service &&
