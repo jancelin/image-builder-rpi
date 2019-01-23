@@ -139,7 +139,8 @@ apt-get install -y \
 # install special Docker enabled kernel
 if [ -z "${KERNEL_URL}" ]; then
   apt-get install -y \
-    --no-install-recommends \
+    --no-install-recommends  \
+    --allow-unauthenticated  \
     "raspberrypi-kernel=${KERNEL_BUILD}"
 else
   curl -L -o /tmp/kernel.deb "${KERNEL_URL}"
