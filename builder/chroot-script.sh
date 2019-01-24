@@ -93,8 +93,9 @@ DEST=$(readlink -m /etc/resolv.conf)
 export DEST
 mkdir -p "$(dirname "${DEST}")"
 #problème proxy à l'univ !!!!
-#echo "nameserver 8.8.8.8" > "${DEST}"
-echo "nameserver 10.2.40.230" > "${DEST}"
+echo "nameserver 8.8.8.8" > "${DEST}"
+#nameserveur univLR
+#echo "nameserver 10.2.40.230" > "${DEST}"
 
 # set up hypriot rpi repository for rpi specific kernel- and firmware-packages
 PACKAGECLOUD_FPR=418A7F2FB0E1E6E7EABF6FE8C2E73424D59097AB
@@ -304,7 +305,6 @@ docker load --input redis4.tar.gz
 docker load --input tracking_1_0.tar.gz
 cd /home/pirate
 docker-compose up -d &&
-sleep 60
 #change docker-compose file
 rm /home/pirate/docker-compose.yml 
 mv /home/pirate/docker-compose-arm32.yml /home/pirate/docker-compose.yml &&
