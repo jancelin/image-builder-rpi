@@ -1,4 +1,4 @@
- docker save jancelin/geo-poppy:release_3_2_arm32_1 | gzip --best --rsyncable > /home/jancelin/image-builder-rpi/images/release_3_2_arm32_1.tar.gz
+ docker save jancelin/geopoppy:lizmap_rpi_3.2.1 | gzip --best --rsyncable > /home/jancelin/image-builder-rpi/images/lizmap_rpi_3.2.1.tar.gz
  
  docker save jancelin/geopoppy:qgis-server2.14LTR-0.2 | gzip --best --rsyncable > /home/jancelin/image-builder-rpi/images/qgis-server2.14LTR-0.2.tar.gz
   

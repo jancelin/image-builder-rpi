@@ -286,7 +286,7 @@ mkdir /src && cd /src
 wget https://cartman.sig.inra.fr/geopoppy/docker/portainer.tar.gz
 wget https://cartman.sig.inra.fr/geopoppy/docker/postgres10-2.4-arm32_1.tar.gz
 wget https://cartman.sig.inra.fr/geopoppy/docker/qgis3server.tar.gz
-wget https://cartman.sig.inra.fr/geopoppy/docker/lizmap_rpi3_3.2rc6.tar.gz
+wget https://cartman.sig.inra.fr/geopoppy/docker/lizmap_rpi_3.2.1.tar.gz
 wget https://cartman.sig.inra.fr/geopoppy/docker/rpi-cloudcmd.tar.gz
 wget https://cartman.sig.inra.fr/geopoppy/docker/redis4.tar.gz
 wget https://cartman.sig.inra.fr/geopoppy/docker/tracking_1_0.tar.gz
@@ -299,7 +299,7 @@ cd /src
 docker load --input portainer.tar.gz
 docker load --input postgres10-2.4-arm32_1.tar.gz
 docker load --input qgis3server.tar.gz
-docker load --input lizmap_rpi3_3.2rc6.tar.gz
+docker load --input lizmap_rpi_3.2.1.tar.gz
 docker load --input rpi-cloudcmd.tar.gz
 docker load --input redis4.tar.gz
 docker load --input tracking_1_0.tar.gz
