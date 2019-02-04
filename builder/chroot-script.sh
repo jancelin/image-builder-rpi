@@ -281,6 +281,12 @@ wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/ja
 wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/jancelin/docker-postgis/master/setup-database.sh
 wget --no-check-certificate -P /home/pirate https://github.com/jancelin/docker-postgis/raw/master/geopoppy.tar
 
+#get & unzip qgis project
+wget --no-check-certificate -P /home/pirate/ https://cartman.sig.inra.fr/geopoppy/data/geopoppy.zip &&
+mkdir /home/pirate/backup/
+unzip /home/pirate/geopoppy.zip /home/pirate/backup/
+
+
 # import docker images
 mkdir /src && cd /src
 wget https://cartman.sig.inra.fr/geopoppy/docker/portainer.tar.gz
@@ -308,6 +314,9 @@ docker-compose up -d &&
 #change docker-compose file
 rm /home/pirate/docker-compose.yml 
 mv /home/pirate/docker-compose-arm32.yml /home/pirate/docker-compose.yml &&
+#change qgis projects
+rm -r /home/pirate/geopoppy/qgis/* &&
+cp -r /home/pirate/backup/geopoppy/* /home/pirate/geopoppy/qgis/ &&
 # change owner root > pirate 
 chown pirate:pirate -R /home/pirate/geopoppy/qgis &&
 chown pirate:pirate /home/pirate/docker-compose.yml &&
