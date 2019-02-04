@@ -279,7 +279,7 @@ wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/ja
 
 #get postgresql backup sql
 wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/jancelin/docker-postgis/master/setup-database.sh
-wget --no-check-certificate -P /home/pirate https://github.com/jancelin/docker-postgis/raw/master/geopoppy.sql
+wget --no-check-certificate -P /home/pirate https://github.com/jancelin/docker-postgis/raw/master/geopoppy.tar
 
 # import docker images
 mkdir /src && cd /src
