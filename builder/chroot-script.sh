@@ -98,9 +98,9 @@ echo "nameserver 8.8.8.8" > "${DEST}"
 #echo "nameserver 10.2.40.230" > "${DEST}"
 
 # set up hypriot rpi repository for rpi specific kernel- and firmware-packages
-PACKAGECLOUD_FPR=418A7F2FB0E1E6E7EABF6FE8C2E73424D59097AB
-PACKAGECLOUD_KEY_URL=https://packagecloud.io/gpg.key
-get_gpg "${PACKAGECLOUD_FPR}" "${PACKAGECLOUD_KEY_URL}"
+#PACKAGECLOUD_FPR=418A7F2FB0E1E6E7EABF6FE8C2E73424D59097AB
+#PACKAGECLOUD_KEY_URL=https://packagecloud.io/gpg.key
+#get_gpg "${PACKAGECLOUD_FPR}" "${PACKAGECLOUD_KEY_URL}"
 
 echo 'deb https://packagecloud.io/Hypriot/rpi/debian/ stretch main' > /etc/apt/sources.list.d/hypriot.list
 
@@ -277,6 +277,13 @@ wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/ja
 mv /home/pirate/docker-compose-flash.yml /home/pirate/docker-compose.yml
 wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/jancelin/geo-poppy/master/docker-compose-arm32.yml
 
+#get nginx conf
+mkdir /home/pirate/geopoppy
+mkdir /home/pirate/geopoppy/etc
+wget --no-check-certificate -P /home/pirate/geopoppy/etc https://raw.githubusercontent.com/jancelin/geo-poppy/master/nginx/nginx.conf
+wget --no-check-certificate -P /home/pirate/geopoppy/etc https://raw.githubusercontent.com/jancelin/geo-poppy/master/nginx/cert.crt
+wget --no-check-certificate -P /home/pirate/geopoppy/etc https://raw.githubusercontent.com/jancelin/geo-poppy/master/nginx/cert.key
+
 #get postgresql backup sql
 wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/jancelin/docker-postgis/master/setup-database.sh
 wget --no-check-certificate -P /home/pirate https://github.com/jancelin/docker-postgis/raw/master/geopoppy.tar
@@ -284,31 +291,20 @@ wget --no-check-certificate -P /home/pirate https://github.com/jancelin/docker-p
 #get & unzip qgis project
 wget --no-check-certificate -P /home/pirate/ https://cartman.sig.inra.fr/geopoppy/data/geopoppy.zip &&
 mkdir /home/pirate/backup/
-unzip /home/pirate/geopoppy.zip /home/pirate/backup/
+apt-get install -y --force-yes --no-install-recommends unzip
+unzip /home/pirate/geopoppy.zip -d /home/pirate/backup/
 
+#get Android GeoPoppy .apk
+wget --no-check-certificate -P /home/pirate/geopoppy/ https://github.com/jancelin/geo-poppy/raw/master/GeoPoppy.apk
 
 # import docker images
-mkdir /src && cd /src
-wget https://cartman.sig.inra.fr/geopoppy/docker/portainer.tar.gz
-wget https://cartman.sig.inra.fr/geopoppy/docker/postgres10-2.4-arm32_1.tar.gz
-wget https://cartman.sig.inra.fr/geopoppy/docker/qgis3server.tar.gz
-wget https://cartman.sig.inra.fr/geopoppy/docker/lizmap_rpi3_3.2rc6.tar.gz
-wget https://cartman.sig.inra.fr/geopoppy/docker/rpi-cloudcmd.tar.gz
-wget https://cartman.sig.inra.fr/geopoppy/docker/redis4.tar.gz
-wget https://cartman.sig.inra.fr/geopoppy/docker/tracking_1_0.tar.gz
+cd /home/pirate
+docker-compose pull
 
 # create startup script
 cat << EOF > /src/start.sh
 #!/bin/bash
 set -xv
-cd /src
-docker load --input portainer.tar.gz
-docker load --input postgres10-2.4-arm32_1.tar.gz
-docker load --input qgis3server.tar.gz
-docker load --input lizmap_rpi_3.2.1.tar.gz
-docker load --input rpi-cloudcmd.tar.gz
-docker load --input redis4.tar.gz
-docker load --input tracking_1_0.tar.gz
 cd /home/pirate
 docker-compose up -d &&
 #change docker-compose file
