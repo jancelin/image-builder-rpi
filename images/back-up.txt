@@ -1,6 +1,6 @@
- docker save jancelin/geopoppy:lizmap_rpi_3.2.1 | gzip --best --rsyncable > /home/jancelin/image-builder-rpi/images/lizmap_rpi_3.2.1.tar.gz
+ docker save jancelin/geopoppy:rpi_lizmap_client_3.2R | gzip --best --rsyncable > /home/jancelin/image-builder-rpi/images/lizmap_rpi.tar.gz
  
- docker save jancelin/geopoppy:qgis-server2.14LTR-0.2 | gzip --best --rsyncable > /home/jancelin/image-builder-rpi/images/qgis-server2.14LTR-0.2.tar.gz
+ docker save jancelin/geopoppy:qgiserver_3.4.6-raspberry3 | gzip --best --rsyncable > /home/jancelin/image-builder-rpi/images/qgis-server_rpi.tar.gz
   
  docker save hypriot/rpi-redis | gzip --best --rsyncable > /home/jancelin/image-builder-rpi/images/rpi-redis.tar.gz
    
@@ -11,5 +11,9 @@
  docker save valentinalexeev/rpi-cloudcmd | gzip --best --rsyncable > /home/jancelin/image-builder-rpi/images/rpi-cloudcmd.tar.gz
  
  docker save jancelin/geopoppy:tracking_1_0 | gzip --best --rsyncable > /home/jancelin/image-builder-rpi/images/tracking_1_0.tar.gz
+ 
+ 
+ 
+ 
  
  ## docker run -p 8099:80 -v /home/jancelin/image-builder-rpi/images:/usr/local/apache2/htdocs httpd:2.4

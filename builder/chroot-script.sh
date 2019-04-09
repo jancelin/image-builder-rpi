@@ -298,13 +298,22 @@ unzip /home/pirate/geopoppy.zip -d /home/pirate/backup/
 wget --no-check-certificate -P /home/pirate/geopoppy/ https://github.com/jancelin/geo-poppy/raw/master/GeoPoppy.apk
 
 # import docker images
-cd /home/pirate
-docker-compose pull
+mkdir /src && cd /src
+cp /home/load/* /src/
 
 # create startup script
 cat << EOF > /src/start.sh
 #!/bin/bash
 set -xv
+cd /src
+docker load --input nginx.tar.gz
+docker load --input lizmap_rpi.tar.gz
+docker load --input qgis-server_rpi.tar.gz
+docker load --input redis4.tar.gz
+docker load --input postgres10-2.4-arm32_1.tar.gz
+docker load --input rpi-cloudcmd.tar.gz
+docker load --input tracking_1_0.tar.gz
+docker load --input portainer.tar.gz
 cd /home/pirate
 docker-compose up -d &&
 #change docker-compose file

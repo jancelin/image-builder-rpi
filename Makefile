@@ -4,7 +4,7 @@ build:
 	docker build -t image-builder-rpi .
 
 sd-image: build
-	docker run --rm --privileged -v $(pwd):/workspace -v /boot:/boot -v /lib/modules:/lib/modules -v /etc/resolv.conf:/etc/resolv.conf -e CIRCLE_TAG -e VERSION image-builder-rpi
+	docker run --rm --privileged -v $(pwd):/workspace -v /boot:/boot -v /lib/modules:/lib/modules -v /etc/resolv.conf:/etc/resolv.conf -v /home/jancelin/image-builder-rpi/images:/home -e CIRCLE_TAG -e VERSION=geopoppy_v0_3_1 image-builder-rpi
 
 shell: build
 	docker run -ti --privileged -v $(pwd):/workspace -v /boot:/boot -v /lib/modules:/lib/modules -v /etc/resolv.conf:/etc/resolv.conf -e CIRCLE_TAG -e VERSION image-builder-rpi bash
