@@ -81,6 +81,8 @@ function get_gpg(){
   fi
 }
 
+
+
 ## examples:
 # clean_print {print|fpr|long|short} {GPGKEYID|FINGERPRINT}
 # get_gpg {GPGKEYID|FINGERPRINT} [URL|FILE]
@@ -286,26 +288,23 @@ wget --no-check-certificate -P /home/pirate/geopoppy/etc https://raw.githubuserc
 
 #get postgresql backup sql
 wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/jancelin/docker-postgis/master/setup-database.sh
-wget --no-check-certificate -P /home/pirate https://github.com/jancelin/docker-postgis/raw/master/geopoppy.tar
+wget --no-check-certificate -P /home/pirate http://172.17.0.1:8099/files/geopoppy.tar
 
 #get & unzip qgis project
-wget --no-check-certificate -P /home/pirate/ https://cartman.sig.inra.fr/geopoppy/data/geopoppy.zip &&
-mkdir /home/pirate/backup/
+wget --no-check-certificate -P /home/pirate/ http://172.17.0.1:8099/files/geopoppy.zip &&
 apt-get install -y --force-yes --no-install-recommends unzip
-unzip /home/pirate/geopoppy.zip -d /home/pirate/backup/
 
 #get Android GeoPoppy .apk
-wget --no-check-certificate -P /home/pirate/geopoppy/ https://github.com/jancelin/geo-poppy/raw/master/GeoPoppy.apk
+wget --no-check-certificate -P /home/pirate/geopoppy/ http://172.17.0.1:8099/files/GeoPoppy.apk
 
-# import docker images
-mkdir /src && cd /src
-cp /home/load/* /src/
+#Docker images
+wget -r -l1 -A.tar.gz -nH http://172.17.0.1:8099/load/ -P /home/pirate/
 
 # create startup script
 cat << EOF > /src/start.sh
 #!/bin/bash
 set -xv
-cd /src
+cd /home/pirate/load
 docker load --input nginx.tar.gz
 docker load --input lizmap_rpi.tar.gz
 docker load --input qgis-server_rpi.tar.gz
@@ -320,8 +319,7 @@ docker-compose up -d &&
 rm /home/pirate/docker-compose.yml 
 mv /home/pirate/docker-compose-arm32.yml /home/pirate/docker-compose.yml &&
 #change qgis projects
-rm -r /home/pirate/geopoppy/qgis/* &&
-cp -r /home/pirate/backup/geopoppy/* /home/pirate/geopoppy/qgis/ &&
+unzip /home/pirate/geopoppy.zip -d /home/pirate/geopoppy/qgis/ &&
 # change owner root > pirate 
 chown pirate:pirate -R /home/pirate/geopoppy/qgis &&
 chown pirate:pirate /home/pirate/docker-compose.yml &&
@@ -343,3 +341,4 @@ rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 echo "HYPRIOT_DEVICE=\"$HYPRIOT_DEVICE\"" >> /etc/os-release
 echo "HYPRIOT_IMAGE_VERSION=\"$HYPRIOT_IMAGE_VERSION\"" >> /etc/os-release
 cp /etc/os-release /boot/os-release
+

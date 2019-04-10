@@ -36,13 +36,13 @@ mkdir ${BUILD_PATH}
 
 # download our base root file system
 if [ ! -f "${ROOTFS_TAR_PATH}" ]; then
-  wget -q -O "${ROOTFS_TAR_PATH}" "https://cartman.sig.inra.fr/geopoppy/rootfs-armhf-raspbian-v2.0.1.tar.gz"
+  wget -q -O "${ROOTFS_TAR_PATH}" "http://172.17.0.1:8099/rootfs-armhf-raspbian-v2.0.1.tar.gz"
 fi
 
 # verify checksum of our root filesystem
 #echo "${ROOTFS_TAR_CHECKSUM} ${ROOTFS_TAR_PATH}" | sha256sum -c -
 
-# extract root file system
+# extract root file systems
 tar xf "${ROOTFS_TAR_PATH}" -C "${BUILD_PATH}"
 
 # register qemu-arm with binfmt
@@ -85,7 +85,7 @@ ls -alh /image_with_kernel_*.tar.gz
 #---------------------------------------------------------------------docker commit focused_knuth image-builder-rpi:temp1
 # download the ready-made raw image for the RPi
 #if [ ! -f "${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" ]; then
-  wget -q -O "${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" "https://cartman.sig.inra.fr/geopoppy/rpi-raw.img.zip" ######if enlevé sinon il prends l'ancien fichier!!!
+  wget -q -O "${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" "http://172.17.0.1:8099/rpi-raw.img.zip" ######if enlevé sinon il prends l'ancien fichier!!!
 #fi
 
 # verify checksum of the ready-made raw image
@@ -113,3 +113,4 @@ cd ${BUILD_RESULT_PATH} && sha256sum "${HYPRIOT_IMAGE_NAME}.zip" > "${HYPRIOT_IM
 
 # test sd-image that we have built
 VERSION=${HYPRIOT_IMAGE_VERSION} rspec --format documentation --color ${BUILD_RESULT_PATH}/builder/test
+
