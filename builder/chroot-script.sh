@@ -301,6 +301,7 @@ wget --no-check-certificate -P /home/pirate/geopoppy/ http://172.17.0.1:8099/fil
 wget -r -l1 -A.tar.gz -nH http://172.17.0.1:8099/load/ -P /home/pirate/
 
 # create startup script
+mkdir /src && cd /src
 cat << EOF > /src/start.sh
 #!/bin/bash
 set -xv

@@ -3,6 +3,9 @@
 
 BEFORE: 
   docker run -p 8099:80 -d -v /home/jancelin/image-builder-rpi/images:/usr/local/apache2/htdocs httpd:2.4
+  
+  #and test
+  http://172.17.0.1:8099/
 
 build:
 	docker build -t image-builder-rpi .
