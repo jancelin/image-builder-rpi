@@ -290,8 +290,9 @@ wget --no-check-certificate -P /home/pirate/geopoppy/etc https://raw.githubuserc
 wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/jancelin/docker-postgis/master/setup-database.sh
 wget --no-check-certificate -P /home/pirate http://172.17.0.1:8099/files/geopoppy.tar
 
-#get & unzip qgis project
+#get & unzip qgis project +jauth.db
 wget --no-check-certificate -P /home/pirate/ http://172.17.0.1:8099/files/geopoppy.zip &&
+wget --no-check-certificate -P /home/pirate/ http://172.17.0.1:8099/files/jauth.db &&
 apt-get install -y --force-yes --no-install-recommends unzip
 
 #get Android GeoPoppy .apk
@@ -312,17 +313,20 @@ docker load --input qgis-server_rpi.tar.gz
 docker load --input redis4.tar.gz
 docker load --input postgres10-2.4-arm32_1.tar.gz
 docker load --input rpi-cloudcmd.tar.gz
-docker load --input tracking_1_0.tar.gz
-docker load --input portainer.tar.gz
+#docker load --input tracking_1_0.tar.gz
+#docker load --input portainer.tar.gz
 cd /home/pirate
 docker-compose up postgis &&
 docker-compose up -d &&
-#change docker-compose file
-#rm /home/pirate/docker-compose.yml 
-#mv /home/pirate/docker-compose-arm32.yml /home/pirate/docker-compose.yml &&
-#change qgis projects
+#change qgis projects + param lizmap
 unzip /home/pirate/geopoppy.zip -d /home/pirate/geopoppy/qgis/ &&
-# change owner root > pirate 
+echo '[repository:demo]    
+label=demo                    
+path="/srv/projects/geopoppy/"
+allowUserDefinedThemes=1'     >> /home/pirate/geopoppy/var/lizmap-config/lizmapConfig.ini.php &&
+mv /home/pirate/jauth.db /home/pirate/geopoppy/var/lizmap-db/jauth.db &&
+# change owner root > pirate
+chown pirate:pirate /home/pirate &&
 chown pirate:pirate -R /home/pirate/geopoppy/qgis &&
 chown pirate:pirate /home/pirate/docker-compose.yml &&
 # systemctl checkdocker.sh
