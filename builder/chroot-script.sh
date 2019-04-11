@@ -277,7 +277,7 @@ wget --no-check-certificate -P /etc/systemd/system https://raw.githubusercontent
 #get docker-compose.yml
 wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/jancelin/geo-poppy/master/docker-compose-flash.yml
 mv /home/pirate/docker-compose-flash.yml /home/pirate/docker-compose.yml
-wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/jancelin/geo-poppy/master/docker-compose-arm32.yml
+#wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/jancelin/geo-poppy/master/docker-compose-arm32.yml
 
 #get nginx conf
 mkdir /home/pirate/geopoppy
@@ -315,10 +315,11 @@ docker load --input rpi-cloudcmd.tar.gz
 docker load --input tracking_1_0.tar.gz
 docker load --input portainer.tar.gz
 cd /home/pirate
+docker-compose up postgis &&
 docker-compose up -d &&
 #change docker-compose file
-rm /home/pirate/docker-compose.yml 
-mv /home/pirate/docker-compose-arm32.yml /home/pirate/docker-compose.yml &&
+#rm /home/pirate/docker-compose.yml 
+#mv /home/pirate/docker-compose-arm32.yml /home/pirate/docker-compose.yml &&
 #change qgis projects
 unzip /home/pirate/geopoppy.zip -d /home/pirate/geopoppy/qgis/ &&
 # change owner root > pirate 
