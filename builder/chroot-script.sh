@@ -286,9 +286,11 @@ wget --no-check-certificate -P /home/pirate/geopoppy/etc https://raw.githubuserc
 wget --no-check-certificate -P /home/pirate/geopoppy/etc https://raw.githubusercontent.com/jancelin/geo-poppy/master/nginx/cert.crt
 wget --no-check-certificate -P /home/pirate/geopoppy/etc https://raw.githubusercontent.com/jancelin/geo-poppy/master/nginx/cert.key
 
-#get postgresql backup sql
+#get postgresql backup sql + pg_memory.sh kernel
 wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/jancelin/docker-postgis/master/setup-database.sh
 wget --no-check-certificate -P /home/pirate http://172.17.0.1:8099/files/geopoppy.tar
+wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/jancelin/geo-poppy/master/install/pg_memory.sh
+chmod +x /home/pirate/pg_memory.sh
 
 #get & unzip qgis project +jauth.db
 wget --no-check-certificate -P /home/pirate/ http://172.17.0.1:8099/files/geopoppy.zip &&
@@ -306,6 +308,7 @@ mkdir /src && cd /src
 cat << EOF > /src/start.sh
 #!/bin/bash
 set -xv
+sh /home/pirate/pg_memory.sh &&
 cd /home/pirate/load
 docker load --input nginx.tar.gz
 docker load --input lizmap_rpi.tar.gz
