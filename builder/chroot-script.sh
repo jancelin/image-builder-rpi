@@ -303,6 +303,12 @@ wget --no-check-certificate -P /home/pirate/geopoppy/ http://172.17.0.1:8099/fil
 #Docker images
 wget -r -l1 -A.tar.gz -nH http://172.17.0.1:8099/load/ -P /home/pirate/
 
+#wps
+wget --no-check-certificate -P /home/pirate/ http://172.17.0.1:8099/files/tests.zip
+mkdir /home/pirate/geopoppy/wps
+mkdir /home/pirate/geopoppy/tests
+unzip /home/pirate/tests.zip -d /home/pirate/geopoppy/tests &&
+
 # create startup script
 mkdir /src && cd /src
 cat << EOF > /src/start.sh
@@ -313,6 +319,7 @@ cd /home/pirate/load
 docker load --input nginx.tar.gz
 docker load --input lizmap_rpi.tar.gz
 docker load --input qgis-server_rpi.tar.gz
+docker load --input qgis-wps_rpi.tar.gz
 docker load --input redis4.tar.gz
 docker load --input postgres10-2.4-arm32_1.tar.gz
 docker load --input rpi-cloudcmd.tar.gz
