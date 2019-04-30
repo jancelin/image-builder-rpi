@@ -306,8 +306,7 @@ wget -r -l1 -A.tar.gz -nH http://172.17.0.1:8099/load/ -P /home/pirate/
 #wps
 wget --no-check-certificate -P /home/pirate/ http://172.17.0.1:8099/files/tests.zip
 mkdir /home/pirate/geopoppy/wps
-mkdir /home/pirate/geopoppy/tests
-unzip /home/pirate/tests.zip -d /home/pirate/geopoppy/tests &&
+unzip /home/pirate/tests.zip -d /home/pirate/geopoppy/wps &&
 
 # create startup script
 mkdir /src && cd /src
