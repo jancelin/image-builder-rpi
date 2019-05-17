@@ -331,7 +331,9 @@ chown pirate:pirate /home/pirate/docker-compose.yml &&
 # systemctl checkdocker.sh
 chmod +x /home/pirate/check_docker.sh &&
 systemctl enable Cdocker.service &&
-systemctl start Cdocker.service
+systemctl start Cdocker.service &&
+#remove docker-image.tar
+rm /home/pirate/docker-images.tar &&
 echo "Installation END"
 EOF
 
