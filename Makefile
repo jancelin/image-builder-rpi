@@ -17,7 +17,7 @@ build:
 	docker build -t image-builder-rpi .
 
 sd-image: build
-	docker run --rm --privileged -v $(pwd):/workspace -v /boot:/boot -v /lib/modules:/lib/modules -e CIRCLE_TAG -e VERSION=V0.3.3 image-builder-rpi
+	docker run --rm --privileged -v $(pwd):/workspace -v /boot:/boot -v /lib/modules:/lib/modules -e CIRCLE_TAG -e VERSION=V0.3.4 image-builder-rpi
 	
 	#univ
 	
