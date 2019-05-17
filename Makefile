@@ -6,6 +6,7 @@ BEFORE:
  cd geo-poppy
  docker-compose pull
  docker save -o docker-images.tar $(docker-compose config | awk '{if ($1 == "image:") print $2;}' ORS=" ")
+ chmod 755 docker-images.tar
  cp docker-images.tar /home/jancelin/image-builder-rpi/images/files/docker-images.tar
 
   docker run -p 8099:80 -d -v /home/jancelin/image-builder-rpi/images:/usr/local/apache2/htdocs httpd:2.4
