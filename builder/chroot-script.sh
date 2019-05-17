@@ -316,18 +316,28 @@ docker-compose up postgis &&
 docker-compose up -d &&
 #change qgis projects + param lizmap
 unzip /home/pirate/geopoppy.zip -d /home/pirate/geopoppy/qgis/ &&
+unzip -o /home/pirate/processing.zip -d /home/pirate/geopoppy/qgis/geopoppy/ &&
 echo '[repository:demo]    
 label=demo                    
 path="/srv/projects/geopoppy/"
 allowUserDefinedThemes=1'     >> /home/pirate/geopoppy/var/lizmap-config/lizmapConfig.ini.php &&
 mv /home/pirate/jauth.db /home/pirate/geopoppy/var/lizmap-db/jauth.db &&
-#unzip wps
-unzip -o /home/pirate/processing.zip -d /home/pirate/geopoppy/qgis/geopoppy/ &&
-docker restart wps &&
 # change owner root > pirate
 chown pirate:pirate /home/pirate &&
 chown pirate:pirate -R /home/pirate/geopoppy/qgis &&
+chown pirate:pirate -R /home/pirate/geopoppy/db_dump &&
 chown pirate:pirate /home/pirate/docker-compose.yml &&
+#explain db_dump
+cat << EOF > /home/pirate/geopoppy/db_dump/procedure.txt
+Save:
+docker exec pirate_postgis_1 sh -c "PGPASSWORD=docker  pg_dump --inserts --format=t --host=localhost --port=5432 -U docker geopoppy > /media/geopoppy.tar"
+Restore:
+  SQL
+docker exec pirate_postgis_1 sh -c "PGPASSWORD=docker psql -h localhost -d geopoppy -U docker -p 5432 -a -w -f /media/your_file.sql"
+  tar
+docker exec pirate_postgis_1 sh -c "PGPASSWORD=docker createdb -O docker -T template_postgis your_dbname"
+docker exec pirate_postgis_1 sh -c "PGPASSWORD=docker pg_restore -d your_dbname /media/your.tar"
+EOF &&
 # systemctl checkdocker.sh
 chmod +x /home/pirate/check_docker.sh &&
 systemctl enable Cdocker.service &&
