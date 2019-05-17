@@ -275,9 +275,7 @@ wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/ja
 wget --no-check-certificate -P /etc/systemd/system https://raw.githubusercontent.com/jancelin/geo-poppy/master/install/Cdocker.service 
 
 #get docker-compose.yml
-wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/jancelin/geo-poppy/master/docker-compose-flash.yml
-mv /home/pirate/docker-compose-flash.yml /home/pirate/docker-compose.yml
-#wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/jancelin/geo-poppy/master/docker-compose-arm32.yml
+wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/jancelin/geo-poppy/master/docker-compose.yml
 
 #get nginx conf
 mkdir /home/pirate/geopoppy
@@ -296,35 +294,24 @@ chmod +x /home/pirate/pg_memory.sh
 wget --no-check-certificate -P /home/pirate/ http://172.17.0.1:8099/files/geopoppy.zip &&
 wget --no-check-certificate -P /home/pirate/ http://172.17.0.1:8099/files/jauth.db &&
 apt-get install -y --force-yes --no-install-recommends unzip
+#wps
+wget --no-check-certificate -P /home/pirate/ http://172.17.0.1:8099/files/processing.zip
 
 #get Android GeoPoppy .apk
 wget --no-check-certificate -P /home/pirate/geopoppy/ http://172.17.0.1:8099/files/GeoPoppy.apk
 
 #Docker images
-wget -r -l1 -A.tar.gz -nH http://172.17.0.1:8099/load/ -P /home/pirate/
-
-#wps
-wget --no-check-certificate -P /home/pirate/ http://172.17.0.1:8099/files/tests.zip
-mkdir /home/pirate/geopoppy/wps
-unzip /home/pirate/tests.zip -d /home/pirate/geopoppy/wps &&
+#wget -r -l1 -A.tar.gz -nH http://172.17.0.1:8099/load/ -P /home/pirate/
+wget --no-check-certificate -P /home/pirate/ http://172.17.0.1:8099/files/docker-images.tar
 
 # create startup script
 mkdir /src && cd /src
 cat << EOF > /src/start.sh
 #!/bin/bash
 set -xv
-sh /home/pirate/pg_memory.sh &&
-cd /home/pirate/load
-docker load --input nginx.tar.gz
-docker load --input lizmap_rpi.tar.gz
-docker load --input qgis-server_rpi.tar.gz
-docker load --input qgis-wps_rpi.tar.gz
-docker load --input redis4.tar.gz
-docker load --input postgres10-2.4-arm32_1.tar.gz
-docker load --input rpi-cloudcmd.tar.gz
-#docker load --input tracking_1_0.tar.gz
-#docker load --input portainer.tar.gz
 cd /home/pirate
+sh /home/pirate/pg_memory.sh &&
+docker load --input docker-images.tar &&
 docker-compose up postgis &&
 docker-compose up -d &&
 #change qgis projects + param lizmap
@@ -334,6 +321,9 @@ label=demo
 path="/srv/projects/geopoppy/"
 allowUserDefinedThemes=1'     >> /home/pirate/geopoppy/var/lizmap-config/lizmapConfig.ini.php &&
 mv /home/pirate/jauth.db /home/pirate/geopoppy/var/lizmap-db/jauth.db &&
+#unzip wps
+unzip -o /home/pirate/processing.zip -d /home/pirate/geopoppy/qgis/geopoppy/ &&
+docker restart wps &&
 # change owner root > pirate
 chown pirate:pirate /home/pirate &&
 chown pirate:pirate -R /home/pirate/geopoppy/qgis &&
