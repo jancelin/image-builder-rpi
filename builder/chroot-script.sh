@@ -326,6 +326,7 @@ mv /home/pirate/jauth.db /home/pirate/geopoppy/var/lizmap-db/jauth.db &&
 chown pirate:pirate /home/pirate &&
 chown pirate:pirate -R /home/pirate/geopoppy/qgis &&
 chown pirate:pirate -R /home/pirate/geopoppy/db_dump &&
+chown 1010:1010 -R /home/pirate/geopoppy/qgiscache
 chown pirate:pirate /home/pirate/docker-compose.yml &&
 # systemctl checkdocker.sh
 chmod +x /home/pirate/check_docker.sh &&
