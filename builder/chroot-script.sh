@@ -243,54 +243,6 @@ chmod +x usr/local/bin/rpi-serial-console
 # fix eth0 interface name
 ln -s /dev/null /etc/systemd/network/99-default.link
 
-#----------------------------------------------------
-#Geopoppy
-##wifi
-apt-get install -y dnsmasq hostapd 
-wget --no-check-certificate -P /etc https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/dhcpcd.conf 
-wget --no-check-certificate -P /etc/network/interfaces.d https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/wlan0 
-wget --no-check-certificate -P /etc/hostapd https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/hostapd.conf  
-mv /etc/default/hostapd /etc/default/hostapd.bak 
-wget --no-check-certificate -P /etc/default https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/hostapd 
-mv /etc/dnsmasq.conf /etc/dnsmasq.conf.orig 
-wget --no-check-certificate -P /etc https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/dnsmasq.conf 
-mv /etc/sysctl.conf /etc/sysctl.conf.bak 
-wget --no-check-certificate -P /etc https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/sysctl.conf 
-wget --no-check-certificate -P /etc https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/iptables.ipv4.nat
-wget --no-check-certificate -P /etc https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/rc.local 
-chmod +x  /etc/rc.local 
-
-# create startup script
-mkdir /src && cd /src
-cat << EOF > /src/start.sh
-#!/bin/bash
-#blink green led for display Victory!!
-for i in `seq 1 24`; do
-sudo sh -c "echo default-on > /sys/class/leds/led0/trigger"   # Static LED on
-sleep 0.2
-sudo sh -c "echo none > /sys/class/leds/led0/trigger"        # Static LED off
-sleep 0.2
-sudo sh -c "echo default-on > /sys/class/leds/led0/trigger"   # Static LED on
-sleep 0.2
-sudo sh -c "echo none > /sys/class/leds/led0/trigger"        # Static LED off
-sleep 0.2
-sudo sh -c "echo default-on > /sys/class/leds/led0/trigger"   # Static LED on
-sleep 0.2
-sudo sh -c "echo none > /sys/class/leds/led0/trigger"        # Static LED off
-sleep 0.2
-sudo sh -c "echo default-on > /sys/class/leds/led0/trigger"   # Static LED on
-sleep 1.5
-sudo sh -c "echo none > /sys/class/leds/led0/trigger"        # Static LED off
-sleep 0.2
-done
-
-sudo sh -c "echo mmc0 > /sys/class/leds/led0/trigger"        # The normal behaviour
-
-EOF
-
-chmod 770 /src/start.sh
-#---------------------------------------------------------
-
 # cleanup APT cache and lists
 apt-get clean
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
