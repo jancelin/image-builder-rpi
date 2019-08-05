@@ -289,6 +289,7 @@ wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/ja
 wget --no-check-certificate -P /home/pirate http://172.17.0.1:8099/files/geopoppy.tar
 wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/jancelin/geo-poppy/master/install/pg_memory.sh
 chmod +x /home/pirate/pg_memory.sh
+wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/jancelin/geo-poppy/master/install/proceduredb.txt
 
 #get & unzip qgis project +jauth.db
 wget --no-check-certificate -P /home/pirate/ http://172.17.0.1:8099/files/geopoppy.zip &&
@@ -322,6 +323,7 @@ label=demo
 path="/srv/projects/geopoppy/"
 allowUserDefinedThemes=1'     >> /home/pirate/geopoppy/var/lizmap-config/lizmapConfig.ini.php &&
 mv /home/pirate/jauth.db /home/pirate/geopoppy/var/lizmap-db/jauth.db &&
+mv /home/pirate/proceduredb.txt /home/pirate/geopoppy/db_dump/proceduredb.txt &&
 # change owner root > pirate
 chown pirate:pirate /home/pirate &&
 chown pirate:pirate -R /home/pirate/geopoppy/qgis &&
