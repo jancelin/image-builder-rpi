@@ -30,12 +30,12 @@ HYPRIOT_IMAGE_NAME="hypriotos-rpi-${HYPRIOT_IMAGE_VERSION}.img"
 export HYPRIOT_IMAGE_VERSION
 
 # download the ready-made raw image for the RPi
-if [ ! -f "${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" ]; then
-  wget -q -O "${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" "https://github.com/hypriot/image-builder-raw/releases/download/${RAW_IMAGE_VERSION}/${RAW_IMAGE}.zip"
-fi
+#if [ ! -f "${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" ]; then
+  wget -q -O "${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" "http://172.17.0.1:8099/rpi-raw.img.zip"
+#fi
 
 # verify checksum of the ready-made raw image
-echo "${RAW_IMAGE_CHECKSUM} ${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" | sha256sum -c -
+#echo "${RAW_IMAGE_CHECKSUM} ${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" | sha256sum -c -
 
 unzip -p "${BUILD_RESULT_PATH}/${RAW_IMAGE}" > "${BUILD_RESULT_PATH}/${HYPRIOT_IMAGE_NAME}"
 
@@ -49,7 +49,7 @@ mkdir ${BUILD_PATH}
 
 # download our base root file system
 if [ ! -f "${ROOTFS_TAR_PATH}" ]; then
-  wget -q -O "${ROOTFS_TAR_PATH}" "https://github.com/hypriot/os-rootfs/releases/download/${HYPRIOT_OS_VERSION}/${ROOTFS_TAR}"
+  wget -q -O "${ROOTFS_TAR_PATH}" "http://172.17.0.1:8099/rootfs-armhf-raspbian-v2.2.1.tar.gz"
 fi
 
 # verify checksum of our root filesystem

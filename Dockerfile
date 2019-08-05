@@ -12,4 +12,6 @@ RUN apt-get update && \
 COPY builder/ /builder/
 
 # build sd card image
+
+RUN chmod +x /builder/build.sh
 CMD /builder/build.sh
