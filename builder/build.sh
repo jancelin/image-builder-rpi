@@ -26,8 +26,22 @@ echo CIRCLE_TAG="${CIRCLE_TAG}"
 
 # name of the sd-image we gonna create
 HYPRIOT_IMAGE_VERSION=${VERSION:="dirty"}
-HYPRIOT_IMAGE_NAME="GeoPoppy-${HYPRIOT_IMAGE_VERSION}.img"
+HYPRIOT_IMAGE_NAME="hypriotos-rpi-${HYPRIOT_IMAGE_VERSION}.img"
 export HYPRIOT_IMAGE_VERSION
+
+# download the ready-made raw image for the RPi
+if [ ! -f "${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" ]; then
+  wget -q -O "${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" "https://github.com/hypriot/image-builder-raw/releases/download/${RAW_IMAGE_VERSION}/${RAW_IMAGE}.zip"
+fi
+
+# verify checksum of the ready-made raw image
+echo "${RAW_IMAGE_CHECKSUM} ${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" | sha256sum -c -
+
+unzip -p "${BUILD_RESULT_PATH}/${RAW_IMAGE}" > "${BUILD_RESULT_PATH}/${HYPRIOT_IMAGE_NAME}"
+
+# export the image partition UUID for use in the chroot script
+IMAGE_PARTUUID_PREFIX=$(dd if="${BUILD_RESULT_PATH}/${HYPRIOT_IMAGE_NAME}" skip=440 bs=1 count=4 2>/dev/null | xxd -e | cut -f 2 -d' ')
+export IMAGE_PARTUUID_PREFIX
 
 # create build directory for assembling our image filesystem
 rm -rf ${BUILD_PATH}
@@ -35,11 +49,11 @@ mkdir ${BUILD_PATH}
 
 # download our base root file system
 if [ ! -f "${ROOTFS_TAR_PATH}" ]; then
-  wget -q -O "${ROOTFS_TAR_PATH}" "https://cartman.sig.inra.fr/geopoppy/rootfs-armhf-raspbian-v2.0.1.tar.gz"
+  wget -q -O "${ROOTFS_TAR_PATH}" "https://github.com/hypriot/os-rootfs/releases/download/${HYPRIOT_OS_VERSION}/${ROOTFS_TAR}"
 fi
 
 # verify checksum of our root filesystem
-#echo "${ROOTFS_TAR_CHECKSUM} ${ROOTFS_TAR_PATH}" | sha256sum -c -
+echo "${ROOTFS_TAR_CHECKSUM} ${ROOTFS_TAR_PATH}" | sha256sum -c -
 
 # extract root file system
 tar xf "${ROOTFS_TAR_PATH}" -C "${BUILD_PATH}"
@@ -81,19 +95,9 @@ rm -Rf ${BUILD_PATH}/boot
 tar -czf /image_with_kernel_root.tar.gz -C ${BUILD_PATH} .
 du -sh ${BUILD_PATH}
 ls -alh /image_with_kernel_*.tar.gz
-#---------------------------------------------------------------------docker commit focused_knuth image-builder-rpi:temp1
-# download the ready-made raw image for the RPi
-#if [ ! -f "${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" ]; then
-  wget -q -O "${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" "https://cartman.sig.inra.fr/geopoppy/rpi-raw.img.zip" ######if enlevé sinon il prends l'ancien fichier!!!
-#fi
-
-# verify checksum of the ready-made raw image
-#echo "${RAW_IMAGE_CHECKSUM} ${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" | sha256sum -c -
-
-unzip -p "${BUILD_RESULT_PATH}/${RAW_IMAGE}" > "/${HYPRIOT_IMAGE_NAME}"
 
 # create the image and add root base filesystem
-guestfish -a "/${HYPRIOT_IMAGE_NAME}"<<_EOF_
+guestfish -a "${BUILD_RESULT_PATH}/${HYPRIOT_IMAGE_NAME}"<<_EOF_
   run
   #import filesystem content
   mount /dev/sda2 /
@@ -107,7 +111,7 @@ _EOF_
 umask 0000
 
 # compress image
-zip "${BUILD_RESULT_PATH}/${HYPRIOT_IMAGE_NAME}.zip" "${HYPRIOT_IMAGE_NAME}"
+cd ${BUILD_RESULT_PATH} && zip "${HYPRIOT_IMAGE_NAME}.zip" "${HYPRIOT_IMAGE_NAME}"
 cd ${BUILD_RESULT_PATH} && sha256sum "${HYPRIOT_IMAGE_NAME}.zip" > "${HYPRIOT_IMAGE_NAME}.zip.sha256" && cd -
 
 # test sd-image that we have built
