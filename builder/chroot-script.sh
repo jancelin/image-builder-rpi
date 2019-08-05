@@ -94,26 +94,23 @@ export DEST
 mkdir -p "$(dirname "${DEST}")"
 echo "nameserver 8.8.8.8" > "${DEST}"
 
-# set up hypriot rpi repository for rpi specific kernel- and firmware-packages
-PACKAGECLOUD_FPR=418A7F2FB0E1E6E7EABF6FE8C2E73424D59097AB
-PACKAGECLOUD_KEY_URL=https://packagecloud.io/gpg.key
-get_gpg "${PACKAGECLOUD_FPR}" "${PACKAGECLOUD_KEY_URL}"
-
-echo 'deb https://packagecloud.io/Hypriot/rpi/debian/ stretch main' > /etc/apt/sources.list.d/hypriot.list
-
 # set up Docker CE repository
 DOCKERREPO_FPR=9DC858229FC7DD38854AE2D88D81803C0EBFCD88
 DOCKERREPO_KEY_URL=https://download.docker.com/linux/raspbian/gpg
 get_gpg "${DOCKERREPO_FPR}" "${DOCKERREPO_KEY_URL}"
 
-CHANNEL=edge # stable, test or edge
-echo "deb [arch=armhf] https://download.docker.com/linux/raspbian stretch $CHANNEL" > /etc/apt/sources.list.d/docker.list
+echo "deb [arch=armhf] https://download.docker.com/linux/raspbian buster $DOCKER_CE_CHANNEL" > /etc/apt/sources.list.d/docker.list
 
+c_rehash
+
+# set up hypriot rpi repository for raspbian specific packages
+echo 'deb https://packagecloud.io/Hypriot/rpi/raspbian/ buster main' >> /etc/apt/sources.list.d/hypriot.list
+curl -L https://packagecloud.io/Hypriot/rpi/gpgkey | apt-key add -
 
 RPI_ORG_FPR=CF8A1AF502A2AA2D763BAE7E82B129927FA3303E RPI_ORG_KEY_URL=http://archive.raspberrypi.org/debian/raspberrypi.gpg.key
 get_gpg "${RPI_ORG_FPR}" "${RPI_ORG_KEY_URL}"
 
-echo 'deb http://archive.raspberrypi.org/debian/ stretch main' | tee /etc/apt/sources.list.d/raspberrypi.list
+echo 'deb http://archive.raspberrypi.org/debian/ buster main' | tee /etc/apt/sources.list.d/raspberrypi.list
 
 # reload package sources
 apt-get update
@@ -151,7 +148,7 @@ fi
 printf "# Spawn a getty on Raspberry Pi serial line\nT0:23:respawn:/sbin/getty -L ttyAMA0 115200 vt100\n" >> /etc/inittab
 
 # boot/cmdline.txt
-echo "dwc_otg.lpm_enable=0 console=serial0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 cgroup_enable=cpuset cgroup_enable=memory swapaccount=1 elevator=deadline fsck.repair=yes rootwait quiet init=/usr/lib/raspi-config/init_resize.sh" > /boot/cmdline.txt
+echo "dwc_otg.lpm_enable=0 console=serial0,115200 console=tty1 root=PARTUUID=${IMAGE_PARTUUID_PREFIX}-02 rootfstype=ext4 cgroup_enable=cpuset cgroup_enable=memory swapaccount=1 elevator=deadline fsck.repair=yes rootwait quiet init=/usr/lib/raspi-config/init_resize.sh" > /boot/cmdline.txt
 
 # create a default boot/config.txt file (details see http://elinux.org/RPiconfig)
 echo "
@@ -172,8 +169,8 @@ echo "snd_bcm2835
 # create /etc/fstab
 echo "
 proc /proc proc defaults 0 0
-/dev/mmcblk0p1 /boot vfat defaults 0 0
-/dev/mmcblk0p2 / ext4 defaults,noatime 0 1
+PARTUUID=${IMAGE_PARTUUID_PREFIX}-01 /boot vfat defaults 0 0
+PARTUUID=${IMAGE_PARTUUID_PREFIX}-02 / ext4 defaults,noatime 0 1
 " > /etc/fstab
 
 # as the Pi does not have a hardware clock we need a fake one
@@ -202,10 +199,9 @@ apt-get install -y \
 
 # install cloud-init
 apt-get install -y \
-  cloud-init
-
-# Fix cloud-init package mirrors
-sed -i '/disable_root: true/a apt_preserve_sources_list: true' /etc/cloud/cloud.cfg
+  --no-install-recommends \
+  cloud-init \
+  ssh-import-id
 
 # Link cloud-init config to VFAT /boot partition
 mkdir -p /var/lib/cloud/seed/nocloud-net
