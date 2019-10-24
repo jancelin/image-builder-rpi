@@ -92,7 +92,10 @@ HYPRIOT_DEVICE="Raspberry Pi"
 DEST=$(readlink -m /etc/resolv.conf)
 export DEST
 mkdir -p "$(dirname "${DEST}")"
-echo "nameserver 8.8.8.8" > "${DEST}"
+#echo "nameserver 8.8.8.8" > "${DEST}"
+#nameserveur univLR
+echo "nameserver 10.2.40.230" > "${DEST}"
+
 
 # set up Docker CE repository
 DOCKERREPO_FPR=9DC858229FC7DD38854AE2D88D81803C0EBFCD88
@@ -258,75 +261,26 @@ mv /etc/sysctl.conf /etc/sysctl.conf.bak
 wget --no-check-certificate -P /etc https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/sysctl.conf 
 wget --no-check-certificate -P /etc https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/iptables.ipv4.nat
 wget --no-check-certificate -P /etc https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/rc.local 
-chmod +x  /etc/rc.local 
+chmod +x  /etc/rc.local &&
 
-##get check_docker.sh
-wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/jancelin/geo-poppy/master/install/check_docker.sh 
-wget --no-check-certificate -P /etc/systemd/system https://raw.githubusercontent.com/jancelin/geo-poppy/master/install/Cdocker.service 
-
-#get docker-compose.yml
-wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/jancelin/geo-poppy/master/docker-compose.yml
-
-#get nginx conf
-mkdir /home/pirate/geopoppy
-mkdir /home/pirate/geopoppy/etc
-wget --no-check-certificate -P /home/pirate/geopoppy/etc https://raw.githubusercontent.com/jancelin/geo-poppy/master/nginx/nginx.conf
-wget --no-check-certificate -P /home/pirate/geopoppy/etc https://raw.githubusercontent.com/jancelin/geo-poppy/master/nginx/cert.crt
-wget --no-check-certificate -P /home/pirate/geopoppy/etc https://raw.githubusercontent.com/jancelin/geo-poppy/master/nginx/cert.key
-
-#get postgresql backup sql + pg_memory.sh kernel
-wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/jancelin/docker-postgis/master/setup-database.sh
-wget --no-check-certificate -P /home/pirate http://172.17.0.1:8099/files/geopoppy.tar
-wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/jancelin/geo-poppy/master/install/pg_memory.sh
-chmod +x /home/pirate/pg_memory.sh
-wget --no-check-certificate -P /home/pirate https://raw.githubusercontent.com/jancelin/geo-poppy/master/install/proceduredb.txt
-
-#get & unzip qgis project +jauth.db
-wget --no-check-certificate -P /home/pirate/ http://172.17.0.1:8099/files/geopoppy.zip &&
-wget --no-check-certificate -P /home/pirate/ http://172.17.0.1:8099/files/jauth.db &&
-apt-get install -y --force-yes --no-install-recommends unzip
-#wps
-wget --no-check-certificate -P /home/pirate/ http://172.17.0.1:8099/files/processing.zip
-
-#get Android GeoPoppy .apk
-wget --no-check-certificate -P /home/pirate/geopoppy/ http://172.17.0.1:8099/files/GeoPoppy.apk
-
-#Docker images
-#wget -r -l1 -A.tar.gz -nH http://172.17.0.1:8099/load/ -P /home/pirate/
-wget --no-check-certificate -P /home/pirate/ http://172.17.0.1:8099/files/docker-images.tar
+#clone
+cd / &&
+git clone https://github.com/jancelin/rtkbase.git
 
 # create startup script
 mkdir /src && cd /src
 cat << EOF > /src/start.sh
 #!/bin/bash
 set -xv
-cd /home/pirate
-sh /home/pirate/pg_memory.sh &&
-docker load --input docker-images.tar &&
-#docker-compose up postgis &&
+cd /rtkbase/docker/root &&
 docker-compose up -d &&
-#change qgis projects + param lizmap
-unzip /home/pirate/geopoppy.zip -d /home/pirate/geopoppy/qgis/ &&
-unzip -o /home/pirate/processing.zip -d /home/pirate/geopoppy/qgis/geopoppy/ &&
-echo '[repository:demo]    
-label=demo                    
-path="/srv/projects/geopoppy/"
-allowUserDefinedThemes=1'     >> /home/pirate/geopoppy/var/lizmap-config/lizmapConfig.ini.php &&
-mv /home/pirate/jauth.db /home/pirate/geopoppy/var/lizmap-db/jauth.db &&
-mv /home/pirate/proceduredb.txt /home/pirate/geopoppy/db_dump/proceduredb.txt &&
-# change owner root > pirate
-chown pirate:pirate /home/pirate &&
-chown pirate:pirate -R /home/pirate/geopoppy/qgis &&
-chown pirate:pirate -R /home/pirate/geopoppy/db_dump &&
-chown pirate:pirate /home/pirate/docker-compose.yml &&
-#change owner for qgis cache (sqlite)
-chown 1010:1010 -R /home/pirate/geopoppy/qgiscache &&
+cd /rtkbase/docker/root/basertk
+docker-compose pull &&
 # systemctl checkdocker.sh
-chmod +x /home/pirate/check_docker.sh &&
+chmod +x /rtkbase/docker/cdocker/check_docker.sh &&
+cp /rtkbase/docker/cdocker/Cdocker.service /etc/systemd/system &&
 systemctl enable Cdocker.service &&
 systemctl start Cdocker.service &&
-#remove docker-image.tar
-rm /home/pirate/docker-images.tar &&
 echo "Installation END"
 EOF
 

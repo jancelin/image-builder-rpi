@@ -3,32 +3,32 @@
 #
 
 # Set your hostname here, the manage_etc_hosts will update the hosts file entries as well
-hostname: geopoppy
+hostname: centipede
 manage_etc_hosts: true
 
 # You could modify this for your own user information
 users:
-  - name: pirate
-    gecos: "Hypriot Pirate"
+  - name: centipede
+    gecos: "Centipede RTK Base"
     sudo: ALL=(ALL) NOPASSWD:ALL
     shell: /bin/bash
     groups: users,docker,video,input
-    plain_text_passwd: geopoppy
+    plain_text_passwd: centipede
     lock_passwd: false
     ssh_pwauth: true
     chpasswd: { expire: false }
 
 # # Set the locale of the system
-# locale: "en_US.UTF-8"
+locale: "fr_FR.UTF-8"
 
 # # Set the timezone
 # # Value of 'timezone' must exist in /usr/share/zoneinfo
-# timezone: "America/Los_Angeles"
+timezone: "Europe/Paris"
 
 # # Update apt packages on first boot
 # package_update: true
 # package_upgrade: true
-# package_reboot_if_required: true
+# package_reboot_if_required: trueAmerica
 package_upgrade: false
 
 # # Install any additional apt packages you need here
