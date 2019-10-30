@@ -18,14 +18,14 @@ build:
 	docker build -t image-builder-rpi .
 
 sd-image: build
-	docker run --rm --privileged -v $(pwd):/workspace -v /boot:/boot -v /lib/modules:/lib/modules -e CIRCLE_TAG=Centipede_ -e VERSION=V0.1 image-builder-rpi
+	docker run --rm --privileged -v $(pwd):/workspace -v /boot:/boot -v /lib/modules:/lib/modules -e CIRCLE_TAG=Centipede -e VERSION=V0.2 image-builder-rpi
 	
 	#univ
 	
-	docker run --rm --privileged -v $(pwd):/workspace -v /boot:/boot -v /lib/modules:/lib/modules -v /etc/resolv.conf:/etc/resolv.conf  -e CIRCLE_TAG -e VERSION=V0.4.0 image-builder-rpi
+	docker run --rm --privileged -v $(pwd):/workspace -v /boot:/boot -v /lib/modules:/lib/modules -v /etc/resolv.conf:/etc/resolv.conf  -e CIRCLE_TAG=centipede -e VERSION=V0.2 image-builder-rpi
 
 shell: build
-	docker run -ti --privileged -v $(pwd):/workspace -v /boot:/boot -v /lib/modules:/lib/modules -v /etc/resolv.conf:/etc/resolv.conf -e CIRCLE_TAG -e VERSION=V0.4.0 image-builder-rpi bash
+	docker run -ti --privileged -v $(pwd):/workspace -v /boot:/boot -v /lib/modules:/lib/modules -v /etc/resolv.conf:/etc/resolv.conf -e CIRCLE_TAG=centipede -e VERSION=V0.2 image-builder-rpi bash
 	
 
 test:

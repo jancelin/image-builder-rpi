@@ -92,9 +92,9 @@ HYPRIOT_DEVICE="Raspberry Pi"
 DEST=$(readlink -m /etc/resolv.conf)
 export DEST
 mkdir -p "$(dirname "${DEST}")"
-#echo "nameserver 8.8.8.8" > "${DEST}"
+echo "nameserver 8.8.8.8" > "${DEST}"
 #nameserveur univLR
-echo "nameserver 10.2.40.230" > "${DEST}"
+#echo "nameserver 10.2.40.230" > "${DEST}"
 
 
 # set up Docker CE repository
@@ -257,7 +257,7 @@ mv /etc/sysctl.conf /etc/sysctl.conf.bak
 wget --no-check-certificate -P /etc https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/sysctl.conf 
 wget --no-check-certificate -P /etc https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/iptables.ipv4.nat
 wget --no-check-certificate -P /etc https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/rc.local 
-chmod +x  /etc/rc.local &&
+chmod +x  /etc/rc.local 
 
 #clone
 cd / &&
@@ -269,6 +269,7 @@ cat << EOF > /src/start.sh
 #!/bin/bash
 set -xv
 cd /rtkbase/docker/root &&
+docker-compose pull &&
 docker-compose up -d &&
 cd /rtkbase/docker/root/basertk
 docker-compose pull &&
@@ -281,6 +282,12 @@ echo "Installation END"
 EOF
 
 chmod 770 /src/start.sh
+
+#disable resolved.service for dnsmasq
+systemctl disable systemd-resolved.service 
+systemctl stop systemd-resolved.service 
+rm /etc/resolv.conf 
+
 #---------------------------------------------------------
 
 # cleanup APT cache and lists
