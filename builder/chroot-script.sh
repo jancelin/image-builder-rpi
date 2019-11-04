@@ -210,31 +210,6 @@ ln -s /boot/meta-data /var/lib/cloud/seed/nocloud-net/meta-data
 # Fix duplicate IP address for eth0, remove file from os-rootfs
 rm -f /etc/network/interfaces.d/eth0
 
-# install docker-machine
-curl -sSL -o /usr/local/bin/docker-machine "https://github.com/docker/machine/releases/download/v${DOCKER_MACHINE_VERSION}/docker-machine-Linux-armhf"
-chmod +x /usr/local/bin/docker-machine
-
-# install bash completion for Docker Machine
-curl -sSL "https://raw.githubusercontent.com/docker/machine/v${DOCKER_MACHINE_VERSION}/contrib/completion/bash/docker-machine.bash" -o /etc/bash_completion.d/docker-machine
-
-# install docker-compose
-apt-get install -y \
-  --no-install-recommends \
-  python
-curl -sSL https://bootstrap.pypa.io/get-pip.py | python
-pip install "docker-compose==${DOCKER_COMPOSE_VERSION}"
-
-# install bash completion for Docker Compose
-curl -sSL "https://raw.githubusercontent.com/docker/compose/${DOCKER_COMPOSE_VERSION}/contrib/completion/bash/docker-compose" -o /etc/bash_completion.d/docker-compose
-
-# install docker-ce (w/ install-recommends)
-apt-get install -y --force-yes \
-  --no-install-recommends \
-  "docker-ce=${DOCKER_CE_VERSION}"
-
-# install bash completion for Docker CLI
-curl -sSL https://raw.githubusercontent.com/docker/docker-ce/master/components/cli/contrib/completion/bash/docker -o /etc/bash_completion.d/docker
-
 echo "Installing rpi-serial-console script"
 wget -q https://raw.githubusercontent.com/lurch/rpi-serial-console/master/rpi-serial-console -O usr/local/bin/rpi-serial-console
 chmod +x usr/local/bin/rpi-serial-console
@@ -242,51 +217,59 @@ chmod +x usr/local/bin/rpi-serial-console
 # fix eth0 interface name
 ln -s /dev/null /etc/systemd/network/99-default.link
 
-#----------------------------------------------------
-#Geopoppy
-##wifi
-apt-get install -y dnsmasq hostapd 
-wget --no-check-certificate -P /etc https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/dhcpcd.conf 
-wget --no-check-certificate -P /etc/network/interfaces.d https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/wlan0 
-wget --no-check-certificate -P /etc/hostapd https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/hostapd.conf  
-mv /etc/default/hostapd /etc/default/hostapd.bak 
-wget --no-check-certificate -P /etc/default https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/hostapd 
-mv /etc/dnsmasq.conf /etc/dnsmasq.conf.orig 
-wget --no-check-certificate -P /etc https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/dnsmasq.conf 
-mv /etc/sysctl.conf /etc/sysctl.conf.bak 
-wget --no-check-certificate -P /etc https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/sysctl.conf 
-wget --no-check-certificate -P /etc https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/iptables.ipv4.nat
-wget --no-check-certificate -P /etc https://raw.githubusercontent.com/jancelin/rpi_wifi_direct/master/raspberry_pi3/rc.local 
-chmod +x  /etc/rc.local 
-
-#clone
-cd / &&
-git clone https://github.com/jancelin/rtkbase.git
-
+#RTKbase----------------------------------------------------
+#install dep
+apt-get update 
+apt-get install -y gcc git build-essential automake checkinstall zip unzip dos2unix bc xxd
+#make rtklib
+git clone -b rtklib_2.4.3 https://github.com/tomojitakasu/RTKLIB.git 
+cd /RTKLIB/app 
+make all 
+make install 
+cp /RTKLIB/app/str2str/gcc/str2str /bin 
+make clean 
+#install node.js npm & cmd + gritty
+cd
+apt-get install -y nodejs
+curl https://www.npmjs.com/install.sh | sh
+wget --no-check-certificate -P ./ https://raw.githubusercontent.com/coderaiser/cloudcmd/master/package.json
+npm install --production
+npm install gritty -g --unsafe-perm
+npm install cloudcmd -g --unsafe-perm
+#clone rtkbase
+cd /
+git clone https://github.com/Stefal/rtkbase.git
+cd /rtkbase
+mv ./settings.conf ./settings.conf.bak
+wget --no-check-certificate -P ./ https://raw.githubusercontent.com/jancelin/rtkbase/master/install/settings.conf
+./copy_unit.sh
+#modify file.service because user is false
+mv /etc/systemd/system/str2str_file.service /etc/systemd/system/str2str_file.service.bak
+wget --no-check-certificate -P /etc/systemd/system/ https://raw.githubusercontent.com/jancelin/rtkbase/master/install/str2str_file.service
+systemctl enable str2str_tcp.service 
+systemctl enable str2str_file.service 
+systemctl enable str2str_ntrip.service 
+#adapt cmd menu & enable service
+#mv /usr/local/lib/node_modules/cloudcmd/static/user-menu.js /usr/local/lib/node_modules/cloudcmd/static/user-menu.js.bak
+wget --no-check-certificate -P /usr/local/lib/node_modules/cloudcmd/static/ https://raw.githubusercontent.com/jancelin/rtkbase/master/install/user-menu.js
+wget --no-check-certificate -P /etc/systemd/system/ https://raw.githubusercontent.com/jancelin/rtkbase/master/install/cmd.service
+systemctl enable cmd.service
+#add tools
+wget --no-check-certificate -P ./ https://raw.githubusercontent.com/jancelin/rtkbase/master/install/convbin.sh
+wget --no-check-certificate -P ./ https://raw.githubusercontent.com/jancelin/rtkbase/master/install/status.sh
+wget --no-check-certificate -P ./ https://raw.githubusercontent.com/jancelin/rtkbase/master/install/rtkrcv.conf
+chmod +x ./convbin.sh
+chmod +x ./status.sh
+#remove make tools
+apt-get autoremove -y gcc build-essential automake checkinstall
 # create startup script
 mkdir /src && cd /src
 cat << EOF > /src/start.sh
 #!/bin/bash
-set -xv
-cd /rtkbase/docker/root &&
-docker-compose pull &&
-docker-compose up -d &&
-cd /rtkbase/docker/root/basertk
-docker-compose pull &&
-# systemctl checkdocker.sh
-chmod +x /rtkbase/docker/cdocker/check_docker.sh &&
-cp /rtkbase/docker/cdocker/Cdocker.service /etc/systemd/system &&
-systemctl enable Cdocker.service &&
-systemctl start Cdocker.service &&
 echo "Installation END"
 EOF
 
 chmod 770 /src/start.sh
-
-#disable resolved.service for dnsmasq
-systemctl disable systemd-resolved.service 
-systemctl stop systemd-resolved.service 
-rm /etc/resolv.conf 
 
 #---------------------------------------------------------
 

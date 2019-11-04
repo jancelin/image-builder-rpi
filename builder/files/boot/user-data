@@ -18,8 +18,8 @@ users:
     ssh_pwauth: true
     chpasswd: { expire: false }
 
-# # Set the locale of the system
-locale: "fr_FR.UTF-8"
+# # Set the locale of the system0
+#locale: "fr_FR.UTF-8"
 
 # # Set the timezone
 # # Value of 'timezone' must exist in /usr/share/zoneinfo
