@@ -250,8 +250,8 @@ systemctl enable str2str_tcp.service
 systemctl enable str2str_file.service 
 systemctl enable str2str_ntrip.service 
 #adapt cmd menu & enable service
-#mv /usr/local/lib/node_modules/cloudcmd/static/user-menu.js /usr/local/lib/node_modules/cloudcmd/static/user-menu.js.bak
-wget --no-check-certificate -P /usr/local/lib/node_modules/cloudcmd/static/ https://raw.githubusercontent.com/jancelin/rtkbase/master/install/user-menu.js
+mv /usr/lib/node_modules/cloudcmd/static/user-menu.js /usr/lib/node_modules/cloudcmd/static/user-menu.js.bak
+wget --no-check-certificate -P /usr/lib/node_modules/cloudcmd/static/ https://raw.githubusercontent.com/jancelin/rtkbase/master/install/user-menu.js
 wget --no-check-certificate -P /etc/systemd/system/ https://raw.githubusercontent.com/jancelin/rtkbase/master/install/cmd.service
 systemctl enable cmd.service
 #add tools
@@ -260,8 +260,10 @@ wget --no-check-certificate -P ./ https://raw.githubusercontent.com/jancelin/rtk
 wget --no-check-certificate -P ./ https://raw.githubusercontent.com/jancelin/rtkbase/master/install/rtkrcv.conf
 chmod +x ./convbin.sh
 chmod +x ./status.sh
-#remove make tools
-apt-get autoremove -y gcc build-essential automake checkinstall
+#remove some tools
+systemctl disable ntp
+apt-get autoremove -y gcc build-essential automake checkinstall ntp
+
 # create startup script
 mkdir /src && cd /src
 cat << EOF > /src/start.sh

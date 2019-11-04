@@ -18,7 +18,7 @@ build:
 	docker build -t image-builder-rpi .
 
 sd-image: build
-	docker run --rm --privileged -v $(pwd):/workspace -v /boot:/boot -v /lib/modules:/lib/modules -e CIRCLE_TAG=Centipede -e VERSION=V0.2.3 image-builder-rpi
+	docker run --rm --privileged -v $(pwd):/workspace -v /boot:/boot -v /lib/modules:/lib/modules -e CIRCLE_TAG=Centipede -e VERSION=V0.2.5 image-builder-rpi
 	
 	#univ
 	
