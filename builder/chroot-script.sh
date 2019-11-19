@@ -261,7 +261,7 @@ wget --no-check-certificate -P ./ https://raw.githubusercontent.com/jancelin/rtk
 chmod +x ./convbin.sh
 chmod +x ./status.sh
 #crontab convbin
-(crontab -l | grep . ; echo -e "0 4 * * * /rtkbase/convbin.sh\n") | crontab -
+echo -e "0 4 * * * root /rtkbase/convbin.sh" >> /etc/crontab
 #remove some tools
 systemctl disable ntp
 apt-get autoremove -y gcc build-essential automake checkinstall ntp
@@ -270,6 +270,7 @@ apt-get autoremove -y gcc build-essential automake checkinstall ntp
 mkdir /src && cd /src
 cat << EOF > /src/start.sh
 #!/bin/bash
+set -xv
 echo "Installation END"
 EOF
 
