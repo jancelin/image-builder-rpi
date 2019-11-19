@@ -262,6 +262,7 @@ chmod +x ./convbin.sh
 chmod +x ./status.sh
 #crontab convbin
 echo -e "0 4 * * * root /rtkbase/convbin.sh" >> /etc/crontab
+cat /etc/crontab
 #remove some tools
 systemctl disable ntp
 apt-get autoremove -y gcc build-essential automake checkinstall ntp
