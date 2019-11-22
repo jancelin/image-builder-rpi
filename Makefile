@@ -9,7 +9,7 @@ BEFORE:
  chmod 655 docker-images.tar
  mv docker-images.tar /home/jancelin/image-builder-rpi/images/files/docker-images.tar
 
-  docker run -p 8099:80 -d -v /home/jancelin/image-builder-rpi/images:/usr/local/apache2/htdocs httpd:2.4
+  docker run -p 8099:80 --rm -d -v /home/jancelin/image-builder-rpi/images:/usr/local/apache2/htdocs httpd:2.4
   
   #and test
   http://172.17.0.1:8099/
@@ -18,7 +18,7 @@ build:
 	docker build -t image-builder-rpi .
 
 sd-image: build
-	docker run --rm --privileged -v $(pwd):/workspace -v /boot:/boot -v /lib/modules:/lib/modules -e CIRCLE_TAG=Centipede -e VERSION=V0.3.0 image-builder-rpi
+	docker run --rm --privileged -v $(pwd):/workspace -v /boot:/boot -v /lib/modules:/lib/modules -e CIRCLE_TAG=Centipede -e VERSION=V0.3.1 image-builder-rpi
 	
 	#univ
 	
