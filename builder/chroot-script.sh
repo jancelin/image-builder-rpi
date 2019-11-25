@@ -262,8 +262,7 @@ systemctl enable cmd.service
 #wget --no-check-certificate -P ./ https://raw.githubusercontent.com/jancelin/rtkbase/master/install/convbin.sh
 #wget --no-check-certificate -P ./ https://raw.githubusercontent.com/jancelin/rtkbase/master/install/status.sh
 #wget --no-check-certificate -P ./ https://raw.githubusercontent.com/jancelin/rtkbase/master/install/rtkrcv.conf
-chmod +x ./convbin.sh
-chmod +x ./status.sh
+find ./ -type f -iname "*.sh" -exec chmod +x {} \;
 #crontab convbin
 echo -e "0 4 * * * root /rtkbase/convbin.sh" >> /etc/crontab
 cat /etc/crontab
