@@ -240,28 +240,16 @@ npm install cloudcmd -g --unsafe-perm
 cd /
 git clone -b 0.3.1 https://github.com/jancelin/rtkbase.git 
 cd /rtkbase
-#mv ./settings.conf ./install/settings.conf.bak
-#wget --no-check-certificate -P ./ https://raw.githubusercontent.com/jancelin/rtkbase/master/install/settings.conf
-#cp ./install/settings.conf ./settings.conf
 ./copy_unit.sh
 ##modify file.service because user is false
-mv /etc/systemd/system/str2str_file.service /etc/systemd/system/str2str_file.service.bak
-#wget --no-check-certificate -P /etc/systemd/system/ https://raw.githubusercontent.com/jancelin/rtkbase/master/install/str2str_file.service
-cp ./install/str2str_file.service /etc/systemd/system/str2str_file.service
 systemctl enable str2str_tcp.service 
 systemctl enable str2str_file.service 
 systemctl enable str2str_ntrip.service 
 ##adapt cmd menu & enable service
 mv /usr/lib/node_modules/cloudcmd/static/user-menu.js /usr/lib/node_modules/cloudcmd/static/user-menu.js.bak
-#wget --no-check-certificate -P /usr/lib/node_modules/cloudcmd/static/ https://raw.githubusercontent.com/jancelin/rtkbase/master/install/user-menu.js
 cp ./install/user-menu.js /usr/lib/node_modules/cloudcmd/static/
-#wget --no-check-certificate -P /etc/systemd/system/ https://raw.githubusercontent.com/jancelin/rtkbase/master/install/cmd.service
-cp ./install/cmd.service /etc/systemd/system/cmd.service
 systemctl enable cmd.service 
-##add tools
-#wget --no-check-certificate -P ./ https://raw.githubusercontent.com/jancelin/rtkbase/master/install/convbin.sh
-#wget --no-check-certificate -P ./ https://raw.githubusercontent.com/jancelin/rtkbase/master/install/status.sh
-#wget --no-check-certificate -P ./ https://raw.githubusercontent.com/jancelin/rtkbase/master/install/rtkrcv.conf
+##exec *.sh
 find ./ -type f -iname "*.sh" -exec chmod +x {} \;
 #crontab convbin
 echo -e "0 4 * * * root /rtkbase/convbin.sh" >> /etc/crontab
