@@ -222,7 +222,8 @@ ln -s /dev/null /etc/systemd/network/99-default.link
 apt-get update 
 apt-get install -y gcc git build-essential automake checkinstall zip unzip dos2unix bc xxd
 #make rtklib
-git clone -b rtklib_2.4.3 https://github.com/tomojitakasu/RTKLIB.git 
+#git clone -b rtklib_2.4.3 https://github.com/tomojitakasu/RTKLIB.git
+git clone -b demo5 https://github.com/rtklibexplorer/RTKLIB.git
 cd /RTKLIB/app 
 make all 
 make install 
@@ -238,16 +239,17 @@ npm install gritty -g --unsafe-perm
 npm install cloudcmd -g --unsafe-perm
 ##clone rtkbase
 cd /
-git clone -b 0.3.1 https://github.com/jancelin/rtkbase.git 
+git clone -b 0.4.0 https://github.com/jancelin/rtkbase.git 
 cd /rtkbase
 ./copy_unit.sh
-##modify file.service because user is false
+##enable services
 systemctl enable str2str_tcp.service 
 systemctl enable str2str_file.service 
-systemctl enable str2str_ntrip.service 
+systemctl enable str2str_ntrip.service
+systemctl enable rfcomm
 ##adapt cmd menu & enable service
 mv /usr/lib/node_modules/cloudcmd/static/user-menu.js /usr/lib/node_modules/cloudcmd/static/user-menu.js.bak
-cp ./install/user-menu.js /usr/lib/node_modules/cloudcmd/static/
+ln -s /rtkbase/install/user-menu.js /usr/lib/node_modules/cloudcmd/static/user-menu.js
 systemctl enable cmd.service 
 ##exec *.sh
 find ./ -type f -iname "*.sh" -exec chmod +x {} \;
@@ -257,6 +259,9 @@ cat /etc/crontab
 #remove some tools
 systemctl disable ntp
 apt-get autoremove -y gcc build-essential automake checkinstall ntp
+#git 
+git config --system http.sslVerify false
+git config --system user.email "contact@centipede.fr"
 
 # create startup script
 mkdir /src && cd /src
