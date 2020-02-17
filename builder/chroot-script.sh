@@ -222,8 +222,8 @@ ln -s /dev/null /etc/systemd/network/99-default.link
 apt-get update 
 apt-get install -y gcc git build-essential automake checkinstall zip unzip dos2unix bc xxd
 #make rtklib
-#git clone -b rtklib_2.4.3 https://github.com/tomojitakasu/RTKLIB.git
-git clone -b demo5 https://github.com/rtklibexplorer/RTKLIB.git
+git clone -b rtklib_2.4.3 https://github.com/tomojitakasu/RTKLIB.git
+#git clone -b demo5 https://github.com/rtklibexplorer/RTKLIB.git
 cd /RTKLIB/app 
 make all 
 make install 
