@@ -220,43 +220,30 @@ ln -s /dev/null /etc/systemd/network/99-default.link
 #RTKbase----------------------------------------------------
 #install dep
 apt-get update 
-apt-get install -y gcc git build-essential automake checkinstall zip unzip dos2unix bc xxd
+apt-get install -y gcc git build-essential automake checkinstall zip unzip dos2unix bc xxd \
+                   python3-pip python3-dev python3-setuptools python3-wheel libsystemd-dev
 #make rtklib
-git clone -b rtklib_2.4.3 https://github.com/tomojitakasu/RTKLIB.git
-#git clone -b demo5 https://github.com/rtklibexplorer/RTKLIB.git
-cd /RTKLIB/app 
-make all 
-make install 
-cp /RTKLIB/app/str2str/gcc/str2str /bin 
-make clean 
-#install node.js npm & cmd + gritty
-cd
-apt-get install -y nodejs
-curl https://www.npmjs.com/install.sh | sh
-wget --no-check-certificate -P ./ https://raw.githubusercontent.com/coderaiser/cloudcmd/master/package.json
-npm install --production
-npm install gritty -g --unsafe-perm
-npm install cloudcmd -g --unsafe-perm
+#git clone -b rtklib_2.4.3 --single-branch https://github.com/tomojitakasu/RTKLIB
+git clone -b demo5 https://github.com/rtklibexplorer/RTKLIB.git
+make -j8 --directory=RTKLIB/app/str2str/gcc
+make -j8 --directory=RTKLIB/app/str2str/gcc install
+make -j8 --directory=RTKLIB/app/rtkrcv/gcc
+make -j8 --directory=RTKLIB/app/rtkrcv/gcc install
+make -j8 --directory=RTKLIB/app/convbin/gcc
+make -j8 --directory=RTKLIB/app/convbin/gcc install 
 ##clone rtkbase
-cd /
-git clone -b 0.4.0 https://github.com/jancelin/rtkbase.git 
-cd /rtkbase
-./copy_unit.sh
+git clone -b web_gui --single-branch https://github.com/stefal/rtkbase.git &&
+#git clone -b web_gui_01 --single-branch https://github.com/jancelin/rtkbase.git &&
+python3 -m pip install -r rtkbase/web_app/requirements.txt
+rtkbase/copy_unit.sh
 ##enable services
-systemctl enable str2str_tcp.service 
-systemctl enable str2str_file.service 
-systemctl enable str2str_ntrip.service
-systemctl enable rfcomm
-##adapt cmd menu & enable service
-mv /usr/lib/node_modules/cloudcmd/static/user-menu.js /usr/lib/node_modules/cloudcmd/static/user-menu.js.bak
-ln -s /rtkbase/install/user-menu.js /usr/lib/node_modules/cloudcmd/static/user-menu.js
-systemctl enable cmd.service 
+systemctl enable rtkbase_web.service
 ##exec *.sh
-find ./ -type f -iname "*.sh" -exec chmod +x {} \;
-#crontab convbin
-echo -e "0 4 * * * root /rtkbase/convbin.sh" >> /etc/crontab
-cat /etc/crontab
-#remove some tools
+#find ./ -type f -iname "*.sh" -exec chmod +x {} \;
+##crontab convbin
+#echo -e "0 4 * * * root /rtkbase/convbin.sh" >> /etc/crontab
+#cat /etc/crontab
+##remove some tools
 systemctl disable ntp
 apt-get autoremove -y gcc build-essential automake checkinstall ntp
 #git 
